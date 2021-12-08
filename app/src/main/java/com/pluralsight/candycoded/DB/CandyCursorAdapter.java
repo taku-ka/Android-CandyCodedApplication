@@ -19,15 +19,12 @@ public class CandyCursorAdapter extends CursorAdapter {
   @Override
   public View newView(Context context, Cursor cursor, ViewGroup parent) {
     return LayoutInflater.from(context).inflate(
-        R.layout.list_item_candy, parent, false);
+            R.layout.list_item_candy, parent, false);
   }
 
-  @Override public void bindView(View view, Context context,
-      Cursor cursor) {
-    TextView textView = (TextView) view.findViewById(
-        R.id.text_view_candy);
-    String candyName = cursor.getString(
-        cursor.getColumnIndexOrThrow("name"));
+  @Override public void bindView(View view, Context context,Cursor cursor) {
+    TextView textView = (TextView) view.findViewById(R.id.text_view_candy);
+    String candyName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
     textView.setText(candyName);
   }
 }

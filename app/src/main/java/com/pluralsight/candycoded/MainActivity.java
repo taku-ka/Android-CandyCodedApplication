@@ -1,14 +1,21 @@
+
+
 package com.pluralsight.candycoded;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -21,6 +28,7 @@ import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 
+import androidx.core.app.ActivityCompat;
 import cz.msebera.android.httpclient.Header;
 
 
@@ -35,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
     SQLiteDatabase db = candyDbHelper.getWritableDatabase();
     Cursor cursor = db.rawQuery("SELECT * FROM candy", null);
+
+    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PackageManager.PERMISSION_GRANTED);
+
 
     final CandyCursorAdapter adapter = new CandyCursorAdapter(this, cursor);
     ListView listView = (ListView)this.findViewById(R.id.list_view_candy);
@@ -52,25 +63,25 @@ public class MainActivity extends AppCompatActivity {
 
     AsyncHttpClient client = new AsyncHttpClient();
     client.get("https://vast-brushlands-23089.herokuapp.com/main/api",
-        new TextHttpResponseHandler() {
-          @Override
-          public void onFailure(int statusCode, Header[] headers, String response, Throwable throwable) {
-            Log.e("AsyncHttpClient", "response = " + response);
-          }
+            new TextHttpResponseHandler() {
+              @Override
+              public void onFailure(int statusCode, Header[] headers, String response, Throwable throwable) {
+                Log.e("AsyncHttpClient", "response = " + response);
+              }
 
-          @Override
-          public void onSuccess(int statusCode, Header[] headers, String response) {
-            Log.d("AsyncHttpClient", "response = " + response);
-            Gson gson = new GsonBuilder().create();;
-            candies = gson.fromJson(response, Candy[].class);
+              @Override
+              public void onSuccess(int statusCode, Header[] headers, String response) {
+                Log.d("AsyncHttpClient", "response = " + response);
+                Gson gson = new GsonBuilder().create();;
+                candies = gson.fromJson(response, Candy[].class);
 
-            addCandiesToDatabase(candies);
+                addCandiesToDatabase(candies);
 
-            SQLiteDatabase db = candyDbHelper.getWritableDatabase();
-            Cursor cursor = db.rawQuery("SELECT * FROM candy", null);
-            //adapter.changeCursor(cursor);
-          }
-        });
+                SQLiteDatabase db = candyDbHelper.getWritableDatabase();
+                Cursor cursor = db.rawQuery("SELECT * FROM candy", null);
+                //adapter.changeCursor(cursor);
+              }
+            });
   }
 
   @Override
@@ -82,6 +93,14 @@ public class MainActivity extends AppCompatActivity {
   // ***
   // TODO - Task 1 - Show Store Information Activity
   // ***
+
+
+  @Override
+  public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    Intent infoIntent=new Intent(this,InfoActivity.class);
+    startActivity(infoIntent);
+    return super.onOptionsItemSelected(item);
+  }
 
   private void addCandiesToDatabase(Candy[] candies) {
     SQLiteDatabase db = candyDbHelper.getWritableDatabase();
